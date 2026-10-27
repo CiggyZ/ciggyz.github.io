@@ -1,0 +1,23 @@
+---
+layout: default
+title: Projects
+section: projects
+permalink: /projects/
+---
+<section class="collection" aria-labelledby="title">
+  <h1 id="title">Projects<span class="accent">.</span></h1>
+  <p class="collection-intro">Things I've built.</p>
+  {% assign entries = site.projects | sort: 'date' | reverse %}
+  {% if entries.size > 0 %}
+  <div class="entry-list" id="project-entries">
+    {% for entry in entries %}
+    <a class="entry" href="{{ entry.url | relative_url }}">
+      <div><h2>{{ entry.title | escape }}</h2><p>{{ entry.summary | default: '' | escape }}</p></div>
+      <div class="entry-meta">{% if entry.date %}{{ entry.date | date: '%Y-%m-%d' }}{% elsif entry.tag %}{{ entry.tag | escape }}{% endif %} &nbsp; <span class="entry-arrow">↗</span></div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-state" id="project-empty">No projects published.</p>
+  {% endif %}
+</section>

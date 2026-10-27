@@ -1,0 +1,23 @@
+---
+layout: default
+title: Writeups
+section: writeups
+permalink: /writeups/
+---
+<section class="collection" aria-labelledby="title">
+  <h1 id="title">Writeups<span class="accent">.</span></h1>
+  <p class="collection-intro">CTFs and technical notes.</p>
+  {% assign entries = site.writeups | sort: 'date' | reverse %}
+  {% if entries.size > 0 %}
+  <div class="entry-list" id="writeup-entries">
+    {% for entry in entries %}
+    <a class="entry" href="{{ entry.url | relative_url }}">
+      <div><h2>{{ entry.title | escape }}</h2><p>{{ entry.summary | default: '' | escape }}</p></div>
+      <div class="entry-meta">{% if entry.date %}{{ entry.date | date: '%Y-%m-%d' }}{% elsif entry.tag %}{{ entry.tag | escape }}{% endif %} &nbsp; <span class="entry-arrow">↗</span></div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-state" id="writeup-empty">No writeups published.</p>
+  {% endif %}
+</section>

@@ -1,0 +1,36 @@
+# GitHub Pages builds this Jekyll website automatically.
+# The layout, cursor and hex background are the original V6 design.
+url: "https://ciggyz.github.io"
+baseurl: ""
+description: "Projects, CTF writeups and notes from Melbourne."
+markdown: kramdown
+highlighter: rouge
+
+collections:
+  writeups:
+    output: true
+    permalink: /writeups/:name/
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: writeups
+    values:
+      layout: entry
+      section: writeups
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: entry
+      section: projects
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - _templates
