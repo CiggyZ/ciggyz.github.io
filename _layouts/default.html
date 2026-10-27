@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,55 +7,302 @@
   <meta name="theme-color" content="#0c0d0e">
   <meta name="description" content="{{ page.description | default: site.description | escape }}">
   <title>{{ page.title | default: 'Home' | escape }}</title>
+
   <link rel="icon" type="image/png" href="{{ '/assets/images/favicon.png' | relative_url }}">
-  <!-- Initialise the custom cursor before first paint, preserving its position across navigation. -->
+
+  <!-- Sliding navigation underline -->
+  <style>
+    .desktop-nav {
+      position: relative;
+    }
+
+    .nav-slide-enabled .desktop-nav a[aria-current="page"]::after {
+      display: none;
+    }
+
+    .nav-slide-line {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 0;
+      height: 1px;
+      background: var(--accent, #c43c3b);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 2;
+      transform: translateX(0);
+    }
+  </style>
+
+  <!-- Restore custom cursor before first paint -->
   <script>
   (() => {
-    if (!window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches) return;
     const root = document.documentElement;
+
+    root.classList.add('nav-slide-enabled');
+
+    if (!window.matchMedia(
+      '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)'
+    ).matches) return;
+
     root.classList.add('precision-active');
+
     const key = 'portfolio-pointer-v1';
     let prior = null;
-    try { prior = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (_) {}
+
+    try {
+      prior = JSON.parse(sessionStorage.getItem(key) || 'null');
+    } catch (_) {}
+
     if (!prior) {
-      try { if (window.name.startsWith(key + ':')) prior = JSON.parse(window.name.slice(key.length + 1)); } catch (_) {}
+      try {
+        if (window.name.startsWith(key + ':')) {
+          prior = JSON.parse(
+            window.name.slice(key.length + 1)
+          );
+        }
+      } catch (_) {}
     }
-    if (prior && Number.isFinite(prior.x) && Number.isFinite(prior.y)) {
-      root.style.setProperty('--cursor-x', Math.max(0, Math.min(innerWidth, prior.x)) + 'px');
-      root.style.setProperty('--cursor-y', Math.max(0, Math.min(innerHeight, prior.y)) + 'px');
+
+    if (
+      prior &&
+      Number.isFinite(prior.x) &&
+      Number.isFinite(prior.y)
+    ) {
+      root.style.setProperty(
+        '--cursor-x',
+        Math.max(0, Math.min(innerWidth, prior.x)) + 'px'
+      );
+
+      root.style.setProperty(
+        '--cursor-y',
+        Math.max(0, Math.min(innerHeight, prior.y)) + 'px'
+      );
+
       root.classList.add('cursor-restored');
     }
   })();
   </script>
+
   <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
   <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
 </head>
+
 <body{% if page.body_class %} class="{{ page.body_class }}"{% endif %}>
+
   <a href="#main" class="skip-link">Skip to content</a>
+
+  <!-- Custom cursor -->
   <div class="precision-cursor" id="precision-cursor" aria-hidden="true"></div>
   <div class="precision-dot" id="precision-dot" aria-hidden="true"></div>
-  <canvas class="terminal-canvas" id="terminal-canvas" aria-hidden="true"></canvas>
+
+  <!-- Animated hexadecimal background -->
+  <canvas
+    class="terminal-canvas"
+    id="terminal-canvas"
+    aria-hidden="true">
+  </canvas>
+
+  <!-- Header -->
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="site-mark" href="{{ '/' | relative_url }}" aria-label="Home"><img src="{{ '/assets/images/mark.webp' | relative_url }}" alt="" width="42" height="42"></a>
+
+      <a
+        class="site-mark"
+        href="{{ '/' | relative_url }}"
+        aria-label="Home">
+        <img
+          src="{{ '/assets/images/mark.webp' | relative_url }}"
+          alt=""
+          width="42"
+          height="42">
+      </a>
+
+      <!-- Desktop navigation -->
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a href="{{ '/' | relative_url }}"{% if page.section == 'home' %} aria-current="page"{% endif %}>Home</a>
-        <a href="{{ '/writeups/' | relative_url }}"{% if page.section == 'writeups' %} aria-current="page"{% endif %}>Writeups</a>
-        <a href="{{ '/projects/' | relative_url }}"{% if page.section == 'projects' %} aria-current="page"{% endif %}>Projects</a>
-        <a href="{{ '/about/' | relative_url }}"{% if page.section == 'about' %} aria-current="page"{% endif %}>About</a>
+
+        <a href="{{ '/' | relative_url }}"
+          {% if page.section == 'home' %}aria-current="page"{% endif %}>
+          Home
+        </a>
+
+        <a href="{{ '/writeups/' | relative_url }}"
+          {% if page.section == 'writeups' %}aria-current="page"{% endif %}>
+          Writeups
+        </a>
+
+        <a href="{{ '/projects/' | relative_url }}"
+          {% if page.section == 'projects' %}aria-current="page"{% endif %}>
+          Projects
+        </a>
+
+        <a href="{{ '/about/' | relative_url }}"
+          {% if page.section == 'about' %}aria-current="page"{% endif %}>
+          About
+        </a>
+
+        <!-- Single moving underline -->
+        <span class="nav-slide-line" aria-hidden="true"></span>
+
       </nav>
-      <div class="header-end"><span class="location">Melbourne, AU</span>
-        <button class="menu-toggle" id="menu-toggle" type="button" aria-controls="mobile-nav" aria-expanded="false">Menu <span aria-hidden="true">+</span></button>
+
+      <div class="header-end">
+        <span class="location">Melbourne, AU</span>
+
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-controls="mobile-nav"
+          aria-expanded="false">
+          Menu <span aria-hidden="true">+</span>
+        </button>
       </div>
+
     </div>
   </header>
-  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden>
-    <a href="{{ '/' | relative_url }}"{% if page.section == 'home' %} aria-current="page"{% endif %}>Home</a>
-    <a href="{{ '/writeups/' | relative_url }}"{% if page.section == 'writeups' %} aria-current="page"{% endif %}>Writeups</a>
-    <a href="{{ '/projects/' | relative_url }}"{% if page.section == 'projects' %} aria-current="page"{% endif %}>Projects</a>
-    <a href="{{ '/about/' | relative_url }}"{% if page.section == 'about' %} aria-current="page"{% endif %}>About</a>
+
+  <!-- Mobile navigation -->
+  <nav
+    class="mobile-nav"
+    id="mobile-nav"
+    aria-label="Mobile navigation"
+    hidden>
+
+    <a href="{{ '/' | relative_url }}"
+      {% if page.section == 'home' %}aria-current="page"{% endif %}>
+      Home
+    </a>
+
+    <a href="{{ '/writeups/' | relative_url }}"
+      {% if page.section == 'writeups' %}aria-current="page"{% endif %}>
+      Writeups
+    </a>
+
+    <a href="{{ '/projects/' | relative_url }}"
+      {% if page.section == 'projects' %}aria-current="page"{% endif %}>
+      Projects
+    </a>
+
+    <a href="{{ '/about/' | relative_url }}"
+      {% if page.section == 'about' %}aria-current="page"{% endif %}>
+      About
+    </a>
+
   </nav>
-  <main id="main" class="shell">{{ content }}</main>
-  <footer class="site-footer shell"><span>Melbourne, Australia</span><a href="https://github.com/CiggyZ" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer>
+
+  <!-- Page content -->
+  <main id="main" class="shell">
+    {{ content }}
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer shell">
+    <span>Melbourne, Australia</span>
+
+    <a
+      href="https://github.com/CiggyZ"
+      target="_blank"
+      rel="noopener noreferrer">
+      GitHub ↗
+    </a>
+  </footer>
+
+  <!-- Smooth navigation underline animation -->
+  <script>
+  (() => {
+    const nav = document.querySelector('.desktop-nav');
+    const line = document.querySelector('.nav-slide-line');
+
+    if (!nav || !line) return;
+
+    const links = [...nav.querySelectorAll('a')];
+    const active = nav.querySelector('a[aria-current="page"]');
+
+    if (!active) return;
+
+    const key = 'portfolio-nav-last-v1';
+
+    const normalize = path =>
+      path.replace(/\/+$/, '') || '/';
+
+    const currentPath = normalize(location.pathname);
+
+    let previousPath = null;
+
+    try {
+      previousPath = sessionStorage.getItem(key);
+      sessionStorage.setItem(key, currentPath);
+    } catch (_) {}
+
+    const previous = links.find(link =>
+      normalize(new URL(link.href).pathname) === previousPath
+    );
+
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    const duration = 480;
+    const easing = 'cubic-bezier(.22, 1, .36, 1)';
+
+    function positionLine(link) {
+      const linkRect = link.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+
+      const x = linkRect.left - navRect.left;
+
+      line.style.width = `${linkRect.width}px`;
+      line.style.transform = `translateX(${x}px)`;
+    }
+
+    function enableAnimation() {
+      line.style.transition =
+        `transform ${duration}ms ${easing}, ` +
+        `width ${duration}ms ${easing}`;
+    }
+
+    const shouldAnimate =
+      previous &&
+      previous !== active &&
+      !reducedMotion;
+
+    // Start from the previous tab.
+    positionLine(shouldAnimate ? previous : active);
+
+    line.style.opacity = '1';
+
+    // Let the browser paint the starting position,
+    // then smoothly slide to the active tab.
+    if (shouldAnimate) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          enableAnimation();
+          positionLine(active);
+        });
+      });
+    }
+
+    // Keep the underline correctly aligned
+    // when the browser window is resized.
+    window.addEventListener('resize', () => {
+      line.style.transition = 'none';
+      positionLine(active);
+    });
+
+    // Handle pages restored from browser history.
+    window.addEventListener('pageshow', event => {
+      if (event.persisted) {
+        line.style.transition = 'none';
+        positionLine(active);
+
+        try {
+          sessionStorage.setItem(key, currentPath);
+        } catch (_) {}
+      }
+    });
+  })();
+  </script>
+
 </body>
 </html>
